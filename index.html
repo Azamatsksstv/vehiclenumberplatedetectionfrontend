@@ -29,7 +29,7 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       overflow: hidden;
-      width: 300px;
+      width: 350px;
       text-align: center;
       padding-bottom: 20px;
     }
@@ -69,13 +69,14 @@
 <body>
   <div>
     <a style="font-size: 20px; " href="https://www.linkedin.com/in/azamatzhambylbayev/" target="_blank">
-        <i class="fab fa-linkedin"></i>
-      </a>
+      <i class="fab fa-linkedin"></i>
+    </a>
     <h1>Number Plate Detecting</h1>
     <input type="file" id="fileInput" />
     <button onclick="handleUpload()">Upload and Process</button>
-    
 
+    <!-- Добавлен элемент для сообщения о загрузке -->
+    <p id="loadingMessage" class="hidden">The download is in progress. Please wait...</p>
 
     <h2 id="enteredImageHeading" class="hidden">Entered Image</h2>
     <div id="enteredImageContainer" class="image-container hidden"></div>
@@ -97,8 +98,13 @@
 
     async function handleUpload() {
       try {
+        // Добавлено отображение сообщения о загрузке
+        const loadingMessage = document.getElementById('loadingMessage');
+        loadingMessage.classList.remove('hidden');
+
         if (!selectedFile) {
           alert('Please choose a file before sending.');
+          loadingMessage.classList.add('hidden'); // Скрыть сообщение, если файл не выбран
           return;
         }
 
@@ -109,6 +115,9 @@
           method: 'POST',
           body: formData,
         });
+
+        // Скрыть сообщение о загрузке после получения ответа
+        loadingMessage.classList.add('hidden');
 
         const responseData = await response.json();
         const baseUrl = 'https://computervisionazekento.pythonanywhere.com/';
@@ -122,6 +131,8 @@
         console.log(responseData.filtered_image.image_file);
       } catch (error) {
         console.error('Error sending POST request:', error);
+        // Скрыть сообщение о загрузке в случае ошибки
+        loadingMessage.classList.add('hidden');
       }
     }
 
