@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Plate Detecting</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding-top: 70px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    div {
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      width: 300px;
+      text-align: center;
+      padding-bottom: 20px;
+    }
+
+    input {
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 80%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <a style="font-size: 20px; " href="https://www.linkedin.com/in/azamatzhambylbayev/" target="_blank">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    <h1>Number Plate Detecting</h1>
+    <input type="file" id="fileInput" />
+    <button onclick="handleUpload()">Upload and Process</button>
+    
+
+
+    <h2 id="enteredImageHeading" class="hidden">Entered Image</h2>
+    <div id="enteredImageContainer" class="image-container hidden"></div>
+
+    <h2 id="filteredImageHeading" class="hidden">Number Plate Image</h2>
+    <div id="filteredImageContainer" class="image-container hidden"></div>
+  </div>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', handleFileChange);
+
+    let selectedFile = null;
+    let enteredImage = null;
+    let filteredImage = null;
+
+    function handleFileChange(event) {
+      selectedFile = event.target.files[0];
+    }
+
+    async function handleUpload() {
+      try {
+        if (!selectedFile) {
+          alert('Please choose a file before sending.');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('image_file', selectedFile);
+
+        const response = await fetch('https://computervisionazekento.pythonanywhere.com/detectnumberplate/', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const responseData = await response.json();
+        const baseUrl = 'https://computervisionazekento.pythonanywhere.com/';
+
+        enteredImage = baseUrl + responseData.entered_image.image_file;
+        filteredImage = baseUrl + responseData.filtered_image.image_file;
+
+        displayImage('enteredImageContainer', enteredImage, 'enteredImageHeading');
+        displayImage('filteredImageContainer', filteredImage, 'filteredImageHeading');
+
+        console.log(responseData.filtered_image.image_file);
+      } catch (error) {
+        console.error('Error sending POST request:', error);
+      }
+    }
+
+    function displayImage(containerId, imageUrl, headingId) {
+      const container = document.getElementById(containerId);
+      const heading = document.getElementById(headingId);
+
+      container.innerHTML = `<img src="${imageUrl}" alt="Image" />`;
+      container.classList.remove('hidden');
+      heading.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
